@@ -1,56 +1,43 @@
 package com.codegym.springboot.controller;
 
+import com.codegym.springboot.models.ERole;
+import com.codegym.springboot.models.Role;
+import com.codegym.springboot.models.User;
+import com.codegym.springboot.payload.request.LoginRequest;
+import com.codegym.springboot.payload.request.SignUpRequest;
+import com.codegym.springboot.payload.response.JwtResponse;
+import com.codegym.springboot.payload.response.MessageResponse;
+import com.codegym.springboot.repository.RoleRepository;
+import com.codegym.springboot.repository.UserRepository;
+import com.codegym.springboot.security.jwt.JwtUtils;
+import com.codegym.springboot.security.service.UserDetailsImpl;
+import lombok.AllArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import com.codegym.springboot.payload.request.SignUpRequest;
-import com.codegym.springboot.payload.response.JwtResponse;
-import com.codegym.springboot.security.service.UserDetailsImpl;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import com.codegym.springboot.models.ERole;
-import com.codegym.springboot.models.Role;
-import com.codegym.springboot.models.User;
-import com.codegym.springboot.payload.request.LoginRequest;
-import com.codegym.springboot.payload.response.MessageResponse;
-import com.codegym.springboot.repository.RoleRepository;
-import com.codegym.springboot.repository.UserRepository;
-import com.codegym.springboot.security.jwt.JwtUtils;
-
-import javax.validation.Valid;
-
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
+@AllArgsConstructor
 @RequestMapping("/api/auth")
 public class AuthController {
-    @Autowired
-    AuthenticationManager authenticationManager;
-
-    @Autowired
-    UserRepository userRepository;
-
-    @Autowired
-    RoleRepository roleRepository;
-
-    @Autowired
-    PasswordEncoder encoder;
-
-    @Autowired
-    JwtUtils jwtUtils;
+    private final AuthenticationManager authenticationManager;
+    private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
+    private final PasswordEncoder encoder;
+    private final JwtUtils jwtUtils;
 
     @PostMapping("/signin")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
@@ -63,7 +50,7 @@ public class AuthController {
 
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
         List<String> roles = userDetails.getAuthorities().stream()
-                .map(item -> item.getAuthority())
+                .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList());
 
         return ResponseEntity.ok(new JwtResponse(jwt,
