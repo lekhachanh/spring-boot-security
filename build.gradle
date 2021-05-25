@@ -38,6 +38,8 @@ dependencies {
 	compile group: 'org.springframework.security', name: 'spring-security-jwt', version: '1.0.10.RELEASE'
 	// https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt
 	compile group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.1'
+	// https://mvnrepository.com/artifact/io.micrometer/micrometer-registry-prometheus
+	implementation group: 'io.micrometer', name: 'micrometer-registry-prometheus', version: '1.7.0'
 }
 
 test {

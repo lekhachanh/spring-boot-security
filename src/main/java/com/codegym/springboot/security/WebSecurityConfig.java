@@ -3,8 +3,10 @@ package com.codegym.springboot.security;
 import com.codegym.springboot.security.jwt.AuthEntryPointJwt;
 import com.codegym.springboot.security.jwt.AuthTokenFilter;
 import com.codegym.springboot.security.service.UserDetailsServiceImpl;
+import io.micrometer.core.instrument.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest;
+import org.springframework.boot.actuate.metrics.web.servlet.WebMvcTagsContributor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -19,12 +21,15 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(
-         securedEnabled = true,
-         jsr250Enabled = true,
+        securedEnabled = true,
+        jsr250Enabled = true,
         prePostEnabled = true)
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
@@ -53,14 +58,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
-//    @Bean
-//    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-//        http.requestMatcher(EndpointRequest.toAnyEndpoint())
-//                .authorizeRequests((requests) -> requests.anyRequest().hasRole("ADMIN"));
-//        http.httpBasic();
-//        return http.build();
-//    }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
